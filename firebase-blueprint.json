@@ -1,0 +1,244 @@
+{
+  "entities": {
+    "Room": {
+      "title": "Room",
+      "description": "A multiplayer Mafia game lobby and active match state.",
+      "type": "object",
+      "properties": {
+        "roomId": {
+          "type": "string",
+          "description": "Unique room join code, uppercase alphanumeric",
+          "maxLength": 16
+        },
+        "hostId": {
+          "type": "string",
+          "description": "UID of the room host player",
+          "maxLength": 128
+        },
+        "hostName": {
+          "type": "string",
+          "description": "Display name of the room host",
+          "maxLength": 64
+        },
+        "status": {
+          "type": "string",
+          "description": "Current lifecycle status of the match",
+          "enum": ["lobby", "role_reveal", "night", "day_announcement", "day_discussion", "voting", "game_over"]
+        },
+        "phaseNumber": {
+          "type": "number",
+          "description": "Incrementing phase sequence counter"
+        },
+        "dayNumber": {
+          "type": "number",
+          "description": "Current day/night cycle count"
+        },
+        "phaseDeadline": {
+          "type": "number",
+          "description": "Unix timestamp in ms when the current phase timer elapses"
+        },
+        "winner": {
+          "type": "string",
+          "description": "Winning faction: town or mafia",
+          "maxLength": 32
+        },
+        "lastEliminatedName": {
+          "type": "string",
+          "description": "Name of the player eliminated in the last cycle",
+          "maxLength": 64
+        },
+        "lastEliminatedRole": {
+          "type": "string",
+          "description": "Role of the player eliminated in the last cycle",
+          "maxLength": 32
+        },
+        "lastNightSummary": {
+          "type": "string",
+          "description": "Narrative summary of night events for the town newspaper",
+          "maxLength": 500
+        },
+        "mafiaCount": {
+          "type": "number",
+          "description": "Number of mafia players configured"
+        },
+        "discussionDurationSec": {
+          "type": "number",
+          "description": "Day discussion time in seconds"
+        },
+        "nightDurationSec": {
+          "type": "number",
+          "description": "Night actions time in seconds"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation ISO date string",
+          "maxLength": 64
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Update ISO date string",
+          "maxLength": 64
+        }
+      },
+      "required": ["roomId", "hostId", "hostName", "status", "createdAt"]
+    },
+    "Player": {
+      "title": "Player",
+      "description": "Participant in a Mafia room with secret identity (mafia or villager).",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique user ID or bot identifier",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Player's display name",
+          "maxLength": 64
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Player avatar image URL",
+          "maxLength": 512
+        },
+        "isHost": {
+          "type": "boolean",
+          "description": "Whether this player is the room administrator"
+        },
+        "isAlive": {
+          "type": "boolean",
+          "description": "Whether this player is currently alive in the match"
+        },
+        "isBot": {
+          "type": "boolean",
+          "description": "Whether this is an AI/Bot fill player"
+        },
+        "role": {
+          "type": "string",
+          "description": "Assigned game role: mafia or villager",
+          "enum": ["mafia", "villager"],
+          "maxLength": 32
+        },
+        "team": {
+          "type": "string",
+          "description": "Allegiance: town or mafia",
+          "enum": ["town", "mafia"],
+          "maxLength": 32
+        },
+        "isReady": {
+          "type": "boolean",
+          "description": "Whether the player is marked ready in the lobby"
+        },
+        "nightTargetId": {
+          "type": "string",
+          "description": "Target UID chosen during night phase by mafia",
+          "maxLength": 128
+        },
+        "voteTargetId": {
+          "type": "string",
+          "description": "Target UID voted for during voting phase (or 'skip')",
+          "maxLength": 128
+        },
+        "joinedAt": {
+          "type": "string",
+          "description": "Join timestamp ISO string",
+          "maxLength": 64
+        }
+      },
+      "required": ["uid", "displayName", "isAlive"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "In-game chat message for town square or mafia syndicate.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique message ID",
+          "maxLength": 128
+        },
+        "senderId": {
+          "type": "string",
+          "description": "Sender UID or system",
+          "maxLength": 128
+        },
+        "senderName": {
+          "type": "string",
+          "description": "Sender display name",
+          "maxLength": 64
+        },
+        "channel": {
+          "type": "string",
+          "description": "Chat channel: town, mafia, or system",
+          "enum": ["town", "mafia", "system"]
+        },
+        "text": {
+          "type": "string",
+          "description": "Message content text",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp ISO string",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "senderId", "senderName", "channel", "text", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Public user stats and profile record.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "User UID",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User name",
+          "maxLength": 64
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Avatar URL",
+          "maxLength": 512
+        },
+        "gamesPlayed": {
+          "type": "number",
+          "description": "Total matches played"
+        },
+        "gamesWon": {
+          "type": "number",
+          "description": "Total matches won"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update ISO string",
+          "maxLength": 64
+        }
+      },
+      "required": ["uid", "displayName"]
+    }
+  },
+  "firestore": {
+    "/rooms/{roomId}": {
+      "schema": { "$ref": "#/entities/Room" },
+      "description": "Multiplayer game room state, phase cycles, and settings."
+    },
+    "/rooms/{roomId}/players/{playerId}": {
+      "schema": { "$ref": "#/entities/Player" },
+      "description": "Subcollection of players participating in the room."
+    },
+    "/rooms/{roomId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Subcollection of live chat messages and system game events."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile and lifetime play stats."
+    }
+  }
+}

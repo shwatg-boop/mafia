@@ -1,0 +1,58 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened helpers
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Health-check / test connection route
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    // User profiles & stats
+    match /users/{userId} {
+      allow read: if isSignedIn() && isValidId(userId);
+      allow create, update: if isSignedIn() && isValidId(userId) && isOwner(userId);
+      allow delete: if false;
+    }
+
+    // Game Rooms
+    match /rooms/{roomId} {
+      allow read: if isSignedIn() && isValidId(roomId);
+      allow create: if isSignedIn() && isValidId(roomId) && request.resource.data.hostId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(roomId);
+      allow delete: if isSignedIn() && isValidId(roomId) && resource.data.hostId == request.auth.uid;
+
+      // Subcollection: Players in room
+      match /players/{playerId} {
+        allow read: if isSignedIn() && isValidId(roomId) && isValidId(playerId);
+        allow create, update: if isSignedIn() && isValidId(roomId) && isValidId(playerId);
+        allow delete: if isSignedIn() && isValidId(roomId) && isValidId(playerId);
+      }
+
+      // Subcollection: Chat & action log messages
+      match /messages/{messageId} {
+        allow read: if isSignedIn() && isValidId(roomId) && isValidId(messageId);
+        allow create: if isSignedIn() && isValidId(roomId) && isValidId(messageId);
+        allow update, delete: if false;
+      }
+    }
+  }
+}

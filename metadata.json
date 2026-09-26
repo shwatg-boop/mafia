@@ -1,0 +1,6 @@
+{
+  "name": "Mafia Noir - Realtime Multiplayer",
+  "description": "Atmospheric real-time multiplayer Mafia party game for mobile browsers featuring Google Auth, host & join rooms, role reveals, night actions, and live voting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
